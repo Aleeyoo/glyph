@@ -105,7 +105,8 @@ fn build_default_keymap(ed: &Editor) -> Keymap {
     bind(K_CTRL_G, "keyboard-quit");
     bind(K_CTRL_SPACE, "set-mark-command");
 
-    km.default = Some("self-insert-command");
+    // No default — unbound keys fall through to the match handler below.
+    // km.default = Some("self-insert-command");
     km
 }
 
