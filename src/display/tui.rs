@@ -1,7 +1,7 @@
 //! Terminal UI initialization and cleanup via crossterm + ratatui.
 
 use crossterm::terminal::{self, EnterAlternateScreen, LeaveAlternateScreen};
-use crossterm::{execute, event};
+use crossterm::execute;
 use ratatui::{backend::CrosstermBackend, Terminal};
 use std::io;
 

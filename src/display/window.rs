@@ -1,4 +1,4 @@
-use crate::types::{BytePos, LineNo, Point, WindowId};
+use crate::types::{Point, WindowId};
 
 /// A window into a buffer. Each window has its own cursor (dot) and mark.
 pub struct Window {
