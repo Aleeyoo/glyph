@@ -31,3 +31,40 @@ pub fn list_buffers(ed: &mut Editor, _f: Flags, _n: i32) -> CmdResult {
     ed.echo_line = s.trim().to_string();
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_editor() -> Editor {
+        Editor::new(24, 80)
+    }
+
+    #[test]
+    fn switch_to_buffer_changes_cur() {
+        let mut ed = test_editor();
+        // Add a second buffer
+        let buf2 = crate::buffer::buffer::Buffer::new(1, "test.txt");
+        ed.buffers.push(buf2);
+        let before = ed.cur_buffer;
+        switch_to_buffer(&mut ed, Flags::default(), 1).unwrap();
+        assert_ne!(ed.cur_buffer, before);
+    }
+
+    #[test]
+    fn kill_buffer_removes_one() {
+        let mut ed = test_editor();
+        let buf2 = crate::buffer::buffer::Buffer::new(1, "test.txt");
+        ed.buffers.push(buf2);
+        let before = ed.buffers.len();
+        kill_buffer(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.buffers.len(), before - 1);
+    }
+
+    #[test]
+    fn list_buffers_output() {
+        let mut ed = test_editor();
+        list_buffers(&mut ed, Flags::default(), 1).unwrap();
+        assert!(ed.echo_line.contains("*scratch*"));
+    }
+}

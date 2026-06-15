@@ -44,3 +44,44 @@ pub fn enlarge_window(ed: &mut Editor, _f: Flags, n: i32) -> CmdResult {
     ed.frame.windows[ed.cur_window].height = new_h;
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_editor() -> Editor {
+        Editor::new(24, 80)
+    }
+
+    #[test]
+    fn split_window_increases_count() {
+        let mut ed = test_editor();
+        let count_before = ed.frame.windows.len();
+        split_window(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.frame.windows.len(), count_before + 1);
+    }
+
+    #[test]
+    fn delete_window_decreases_count() {
+        let mut ed = test_editor();
+        split_window(&mut ed, Flags::default(), 1).unwrap();
+        let count_before = ed.frame.windows.len();
+        delete_window(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.frame.windows.len(), count_before - 1);
+    }
+
+    #[test]
+    fn other_window_changes_active() {
+        let mut ed = test_editor();
+        split_window(&mut ed, Flags::default(), 1).unwrap();
+        let before = ed.cur_window;
+        other_window(&mut ed, Flags::default(), 1).unwrap();
+        assert_ne!(ed.cur_window, before);
+    }
+
+    #[test]
+    fn delete_window_on_single_doesnt_crash() {
+        let mut ed = test_editor();
+        delete_window(&mut ed, Flags::default(), 1).unwrap();
+    }
+}

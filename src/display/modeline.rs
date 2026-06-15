@@ -36,3 +36,15 @@ pub fn draw(ed: &Editor, f: &mut Frame, area: Rect) {
         .block(block);
     f.render_widget(paragraph, area);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn format_contains_buffer_name() {
+        let ed = Editor::new(24, 80);
+        let text = format!("{:?}", ed.active_buffer().name);
+        assert!(text.contains("scratch"));
+    }
+}

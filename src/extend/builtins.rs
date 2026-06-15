@@ -94,3 +94,70 @@ pub fn builtin_print(args: &[LispVal]) -> Result<LispVal, String> {
     println!("{}", s.join(" "));
     Ok(LispVal::Nil)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn car_returns_first() {
+        let cell = LispVal::Cons(Box::new(LispVal::Integer(1)), Box::new(LispVal::Integer(2)));
+        let result = builtin_car(&[cell]).unwrap();
+        assert_eq!(format!("{}", result), "1");
+    }
+
+    #[test]
+    fn cdr_returns_rest() {
+        let cell = LispVal::Cons(Box::new(LispVal::Integer(1)), Box::new(LispVal::Integer(2)));
+        let result = builtin_cdr(&[cell]).unwrap();
+        assert_eq!(format!("{}", result), "2");
+    }
+
+    #[test]
+    fn cons_creates_pair() {
+        let result = builtin_cons(&[LispVal::Integer(1), LispVal::Integer(2)]).unwrap();
+        assert_eq!(format!("{}", result), "(1 . 2)");
+    }
+
+    #[test]
+    fn add_sums() {
+        let result = builtin_add(&[LispVal::Integer(1), LispVal::Integer(2), LispVal::Integer(3)]).unwrap();
+        assert_eq!(format!("{}", result), "6");
+    }
+
+    #[test]
+    fn sub_difference() {
+        let result = builtin_sub(&[LispVal::Integer(10), LispVal::Integer(3)]).unwrap();
+        assert_eq!(format!("{}", result), "7");
+    }
+
+    #[test]
+    fn mul_product() {
+        let result = builtin_mul(&[LispVal::Integer(3), LispVal::Integer(4)]).unwrap();
+        assert_eq!(format!("{}", result), "12");
+    }
+
+    #[test]
+    fn div_quotient() {
+        let result = builtin_div(&[LispVal::Integer(10), LispVal::Integer(2)]).unwrap();
+        assert_eq!(format!("{}", result), "5");
+    }
+
+    #[test]
+    fn eq_integers_equal() {
+        let result = builtin_eq(&[LispVal::Integer(42), LispVal::Integer(42)]).unwrap();
+        assert_eq!(format!("{}", result), "t");
+    }
+
+    #[test]
+    fn eq_integers_not_equal() {
+        let result = builtin_eq(&[LispVal::Integer(1), LispVal::Integer(2)]).unwrap();
+        assert_eq!(format!("{}", result), "nil");
+    }
+
+    #[test]
+    fn atom_returns_t_for_integer() {
+        let result = builtin_atom(&[LispVal::Integer(5)]).unwrap();
+        assert_eq!(format!("{}", result), "t");
+    }
+}

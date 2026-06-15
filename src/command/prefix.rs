@@ -71,6 +71,66 @@ pub fn what_cursor_position(ed: &mut Editor, _f: Flags, _n: i32) -> CmdResult {
     Ok(())
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_editor() -> Editor {
+        Editor::new(24, 80)
+    }
+
+    #[test]
+    fn universal_argument_sets_prefix() {
+        let mut ed = test_editor();
+        universal_argument(&mut ed, Flags::default(), 4).unwrap();
+        assert_eq!(ed.prefix_arg, 4);
+    }
+
+    #[test]
+    fn set_mark_records_position() {
+        let mut ed = test_editor();
+        // Move dot first, then set mark
+        let (win, buf) = ed.active_window_and_buffer_mut();
+        buf.text = crate::buffer::text::GapBuffer::from_text("hello");
+        win.dot.pos = 3;
+        drop(buf);
+        set_mark(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.active_window().mark.unwrap().pos, 3);
+    }
+
+    #[test]
+    fn exchange_point_and_mark_swaps() {
+        let mut ed = test_editor();
+        let (win, buf) = ed.active_window_and_buffer_mut();
+        buf.text = crate::buffer::text::GapBuffer::from_text("hello world");
+        win.dot.pos = 5;
+        win.mark = Some(crate::types::Point::new(0, 1, 0));
+        drop(buf);
+        exchange_point_and_mark(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.active_window().dot.pos, 0);
+        assert_eq!(ed.active_window().mark.unwrap().pos, 5);
+    }
+
+    #[test]
+    fn what_cursor_position_shows() {
+        let mut ed = test_editor();
+        let (_, buf) = ed.active_window_and_buffer_mut();
+        buf.text = crate::buffer::text::GapBuffer::from_text("abcdef");
+        drop(buf);
+        what_cursor_position(&mut ed, Flags::default(), 1).unwrap();
+        assert!(!ed.echo_line.is_empty());
+    }
+
+    #[test]
+    fn redraw_display_does_not_crash() {
+        let mut ed = test_editor();
+        let (win, _) = ed.active_window_and_buffer_mut();
+        win.dot.line = 42;
+        drop(win);
+        redraw_display(&mut ed, Flags::default(), 1).unwrap();
+    }
+}
+
 /// redraw-display (C-l)
 pub fn redraw_display(ed: &mut Editor, _f: Flags, _n: i32) -> CmdResult {
     let (win, _) = ed.active_window_and_buffer_mut();

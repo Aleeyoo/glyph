@@ -84,3 +84,45 @@ impl Default for KeymapTree {
         Self::new()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn lookup_returns_action_for_registered_key() {
+        let km = Keymap {
+            name: "test".into(),
+            entries: vec![KeyEntry {
+                start: 1, end: 1,
+                action: KeyAction::Command("test-cmd"),
+            }],
+            default: None,
+        };
+        assert!(km.lookup(1).is_some());
+        assert_eq!(format!("{:?}", km.lookup(1).unwrap()), "Command(\"test-cmd\")");
+    }
+
+    #[test]
+    fn lookup_returns_none_for_unregistered_key() {
+        let km = Keymap::new("empty");
+        assert!(km.lookup(99).is_none());
+    }
+
+    #[test]
+    fn lookup_matches_range() {
+        let km = Keymap {
+            name: "range".into(),
+            entries: vec![KeyEntry {
+                start: 10, end: 20,
+                action: KeyAction::Command("range-cmd"),
+            }],
+            default: None,
+        };
+        assert!(km.lookup(10).is_some());
+        assert!(km.lookup(15).is_some());
+        assert!(km.lookup(20).is_some());
+        assert!(km.lookup(9).is_none());
+        assert!(km.lookup(21).is_none());
+    }
+}

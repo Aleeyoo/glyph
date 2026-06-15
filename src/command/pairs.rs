@@ -40,3 +40,30 @@ pub fn blink_and_insert(ed: &mut Editor, f: Flags, c: i32) -> CmdResult {
 pub fn showmatch(ed: &mut Editor, f: Flags, n: i32) -> CmdResult {
     blink_and_insert(ed, f, n)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_editor() -> Editor {
+        Editor::new(24, 80)
+    }
+
+    #[test]
+    fn blink_and_insert_paren_finds_match() {
+        let mut ed = test_editor();
+        // Insert "(hello " first, then ")"
+        let (win, buf) = ed.active_window_and_buffer_mut();
+        buf.text = crate::buffer::text::GapBuffer::from_text("(hello");
+        win.dot.pos = 6;
+        drop(buf);
+        blink_and_insert(&mut ed, Flags::default(), b')' as i32).unwrap();
+        assert!(ed.active_buffer().text.to_string().ends_with(')'));
+    }
+
+    #[test]
+    fn blink_and_insert_no_match_does_not_crash() {
+        let mut ed = test_editor();
+        blink_and_insert(&mut ed, Flags::default(), b']' as i32).unwrap();
+    }
+}

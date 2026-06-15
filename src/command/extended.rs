@@ -221,3 +221,62 @@ pub fn just_one_space(ed: &mut Editor, _f: Flags, _n: i32) -> CmdResult {
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_editor() -> Editor {
+        Editor::new(24, 80)
+    }
+
+    #[test]
+    fn forward_word_skips_spaces() {
+        let mut ed = test_editor();
+        let (_, buf) = ed.active_window_and_buffer_mut();
+        buf.text = crate::buffer::text::GapBuffer::from_text("hello world");
+        drop(buf);
+        forward_word(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.active_window().dot.pos, 5);
+    }
+
+    #[test]
+    fn backward_word_moves_to_start() {
+        let mut ed = test_editor();
+        let (win, buf) = ed.active_window_and_buffer_mut();
+        buf.text = crate::buffer::text::GapBuffer::from_text("hello world");
+        win.dot.pos = 6;
+        backward_word(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.active_window().dot.pos, 0);
+    }
+
+    #[test]
+    fn capitalize_word_works() {
+        let mut ed = test_editor();
+        let (_, buf) = ed.active_window_and_buffer_mut();
+        buf.text = crate::buffer::text::GapBuffer::from_text("hello");
+        capitalize_word(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.active_buffer().text.to_string(), "Hello");
+    }
+
+    #[test]
+    fn transpose_chars_swaps() {
+        let mut ed = test_editor();
+        let (win, buf) = ed.active_window_and_buffer_mut();
+        buf.text = crate::buffer::text::GapBuffer::from_text("ab");
+        win.dot.pos = 1;
+        transpose_chars(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.active_buffer().text.to_string(), "ba");
+    }
+
+    #[test]
+    fn delete_blank_lines_collapses() {
+        let mut ed = test_editor();
+        let (_, buf) = ed.active_window_and_buffer_mut();
+        buf.text = crate::buffer::text::GapBuffer::from_text("a\n\n\nb");
+        delete_blank_lines(&mut ed, Flags::default(), 1).unwrap();
+        let result = ed.active_buffer().text.to_string();
+        // Should keep at most one blank line
+        assert_eq!(result, "a\nb");
+    }
+}

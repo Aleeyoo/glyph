@@ -49,7 +49,7 @@ pub fn getkey() -> KCode {
     }
 }
 
-fn translate_key(code: KeyCode, mods: event::KeyModifiers) -> KCode {
+pub(crate) fn translate_key(code: KeyCode, mods: event::KeyModifiers) -> KCode {
     let ctrl = mods.contains(event::KeyModifiers::CONTROL);
     match code {
         KeyCode::Char(c) => {
@@ -75,5 +75,47 @@ fn translate_key(code: KeyCode, mods: event::KeyModifiers) -> KCode {
         KeyCode::PageDown => K_PGDN,
         KeyCode::Delete => K_DEL,
         _ => 0,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crossterm::event::{KeyCode, KeyModifiers};
+
+    #[test]
+    fn ctrl_a_returns_1() {
+        let kc = translate_key(KeyCode::Char('a'), KeyModifiers::CONTROL);
+        assert_eq!(kc, K_CTRL_A);
+    }
+
+    #[test]
+    fn ctrl_x_returns_24() {
+        let kc = translate_key(KeyCode::Char('x'), KeyModifiers::CONTROL);
+        assert_eq!(kc, 24);
+    }
+
+    #[test]
+    fn plain_char_returns_its_code() {
+        let kc = translate_key(KeyCode::Char('g'), KeyModifiers::NONE);
+        assert_eq!(kc, b'g' as u16);
+    }
+
+    #[test]
+    fn esc_returns_27() {
+        let kc = translate_key(KeyCode::Esc, KeyModifiers::NONE);
+        assert_eq!(kc, 27);
+    }
+
+    #[test]
+    fn enter_returns_10() {
+        let kc = translate_key(KeyCode::Enter, KeyModifiers::NONE);
+        assert_eq!(kc, b'\n' as u16);
+    }
+
+    #[test]
+    fn backspace_returns_127() {
+        let kc = translate_key(KeyCode::Backspace, KeyModifiers::NONE);
+        assert_eq!(kc, 0x7f);
     }
 }

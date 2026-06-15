@@ -39,3 +39,44 @@ pub fn query_replace(ed: &mut Editor, _f: Flags, _n: i32) -> CmdResult {
     ed.set_dirty(true);
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_editor() -> Editor {
+        Editor::new(24, 80)
+    }
+
+    #[test]
+    fn search_forward_finds_text() {
+        let mut ed = test_editor();
+        let (win, buf) = ed.active_window_and_buffer_mut();
+        buf.text = crate::buffer::text::GapBuffer::from_text("hello world");
+        win.dot.pos = 0;
+        drop(buf); // end mutable borrow of editor
+        ed.search_pattern = "world".to_string();
+        search_forward(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.active_window().dot.pos, 6);
+    }
+
+    #[test]
+    fn search_forward_empty_does_nothing() {
+        let mut ed = test_editor();
+        search_forward(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.active_window().dot.pos, 0);
+    }
+
+    #[test]
+    fn query_replaces_matched_text() {
+        let mut ed = test_editor();
+        let (win, buf) = ed.active_window_and_buffer_mut();
+        buf.text = crate::buffer::text::GapBuffer::from_text("foo foo bar");
+        win.dot.pos = 0;
+        drop(buf);
+        ed.search_pattern = "foo".to_string();
+        ed.replace_pattern = "baz".to_string();
+        query_replace(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.active_buffer().text.to_string(), "baz baz bar");
+    }
+}
