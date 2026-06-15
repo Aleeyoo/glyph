@@ -9,6 +9,7 @@ pub mod meta;
 pub mod extended;
 pub mod search;
 pub mod shell;
+pub mod advanced;
 
 use crate::Editor;
 
