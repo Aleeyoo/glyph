@@ -4,12 +4,38 @@ mod display;
 mod input;
 mod editor;
 
+use std::io;
 use editor::Editor;
+use display::tui;
+use input::getkey;
 
-fn main() {
-    // For now, just run with simulated terminal size.
-    // P0-9 (ratatui init) deferred until network is available.
-    let _editor = Editor::new(24, 80);
-    println!("glyph — a lightweight Emacs-compatible text editor");
-    println!("Phase 0 skeleton complete. {} tasks done.", 7);
+fn main() -> tui::TuiResult<()> {
+    // Initialize terminal
+    let mut terminal = tui::init()?;
+    let mut editor = Editor::new(terminal.size()?.height as usize, terminal.size()?.width as usize);
+
+    // Draw initial blank screen
+    terminal.draw(|f| {
+        let _ = f.size();
+    })?;
+
+    // Event loop
+    while editor.running {
+        let kc = getkey::getkey();
+
+        // C-x C-c quits
+        // ESC quits (simple for now; proper prefix key dispatch later)
+        if kc == getkey::K_CTRL_C || kc == getkey::K_ESC {
+            editor.running = false;
+        }
+
+        // Refresh display each frame
+        terminal.draw(|f| {
+            let _ = f.size();
+        })?;
+    }
+
+    // Cleanup
+    tui::cleanup()?;
+    Ok(())
 }
