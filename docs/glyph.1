@@ -1,0 +1,77 @@
+.\" glyph — Emacs-compatible text editor
+.Dd 2026-06-15
+.Dt GLYPH 1
+.Os
+.Sh NAME
+.Nm glyph
+.Nd Emacs-compatible text editor
+.Sh SYNOPSIS
+.Nm
+.Op Fl R
+.Op Fl n
+.Op Fl b Ar file
+.Op Ar +N
+.Op Ar file ...
+.Sh DESCRIPTION
+.Nm
+is a lightweight, Emacs-compatible text editor, rewritten from mg in Rust.
+It supports UTF-8, syntax highlighting, and a miniLisp extension language.
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl R
+Make all buffers read-only.
+.It Fl n
+Disable backup files.
+.It Fl b Ar file
+Batch mode: execute commands from Ar file and exit.
+.It Ar + N
+Open files starting at line number N.
+.El
+.Sh COMMANDS
+.Nm
+supports most standard Emacs keybindings including:
+.Pp
+.Bl -tag -width "M-x" -compact
+.It C-n , C-p
+Next/previous line
+.It C-f , C-b
+Forward/backward character
+.It C-a , C-e
+Beginning/end of line
+.It C-v , M-v
+Scroll up/down
+.It C-s , C-r
+Search forward/backward
+.It C-space
+Set mark
+.It C-x C-c
+Quit
+.It C-x C-f
+Find file
+.It C-x C-s
+Save buffer
+.It C-x C-k
+Kill buffer
+.It C-x C-b
+List buffers
+.It C-x 2
+Split window
+.It C-x 0
+Delete window
+.It C-x o
+Other window
+.It M-x
+Execute extended command
+.It M-f , M-b
+Forward/backward word
+.El
+.Sh EXTENSIONS
+.Nm
+supports a miniLisp scripting language.
+Configuration is loaded from
+.Pa ~/.config/glyph/config.mg .
+.Sh AUTHORS
+.Nm
+is derived from mg by Han Boetes, which is derived from
+MicroEMACS by Dave Conroy, and OpenBSD mg by various contributors.
