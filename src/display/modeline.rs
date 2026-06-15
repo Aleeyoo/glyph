@@ -27,7 +27,7 @@ pub fn draw(ed: &Editor, f: &mut Frame, area: Rect) {
     };
 
     let text = Line::from(format!("{} Mg: {} ({})  {}{}", modified, buf.name, mode_name, pos, suffix));
-    let style = Style::default().bg(Color::Cyan).fg(Color::Black);
+    let style = Style::default().bg(Color::DarkGray).fg(Color::White);
 
     let block = Block::default()
         .borders(Borders::TOP)
