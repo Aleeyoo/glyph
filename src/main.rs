@@ -82,8 +82,7 @@ fn build_default_keymap(ed: &Editor) -> Keymap {
     let mut km = Keymap::new("global");
 
     use input::getkey::{K_CTRL_A, K_CTRL_B, K_CTRL_D, K_CTRL_E, K_CTRL_F, K_CTRL_G,
-        K_CTRL_K, K_CTRL_N, K_CTRL_P, K_CTRL_S, K_CTRL_R, K_CTRL_V, K_CTRL_SPACE,
-        K_CTRL_X, K_ESC};
+        K_CTRL_K, K_CTRL_N, K_CTRL_P, K_CTRL_S, K_CTRL_R, K_CTRL_SPACE};
 
     // Helper to register a single-key binding
     let mut bind = |kc: KCode, cmd: &'static str| {

@@ -7,6 +7,12 @@ edition = "2024"
 crossterm = "0.29"
 ratatui = "0.30"
 
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+
 [[bench]]
 name = "glyph-criterion"
 harness = false

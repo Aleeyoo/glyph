@@ -16,7 +16,7 @@ pub fn draw(ed: &Editor, f: &mut Frame, area: Rect) {
     if area.is_empty() { return; }
 
     let text = ed.active_buffer().text.to_vec();
-    let dot_pos = ed.active_window().dot.pos;
+    let _dot_pos = ed.active_window().dot.pos;
     let height = area.height as usize;
 
     // Compute line starts by scanning for newlines
@@ -32,7 +32,7 @@ pub fn draw(ed: &Editor, f: &mut Frame, area: Rect) {
     let top_line = ed.active_window().top_line.saturating_sub(1);
 
     // Find which display row the dot line is on
-    let mut display_line = 0;
+    let mut display_line;
     if dot_line_num >= total_lines {
         display_line = total_lines.saturating_sub(1).saturating_sub(top_line);
     } else {
