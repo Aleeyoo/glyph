@@ -5,6 +5,7 @@ mod input;
 mod command;
 mod util;
 mod syntax;
+mod extend;
 mod editor;
 
 use editor::Editor;
