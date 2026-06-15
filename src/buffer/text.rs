@@ -264,4 +264,29 @@ mod tests {
         assert_eq!(gb.len(), 10_000);
         assert_eq!(gb.to_string(), data);
     }
+
+    #[test]
+    fn delete_entire_buffer() {
+        let mut gb = GapBuffer::from_text("hello");
+        gb.delete_at(0, 5);
+        assert!(gb.is_empty());
+        assert_eq!(gb.to_string(), "");
+    }
+
+    #[test]
+    fn insert_at_boundary_after_delete() {
+        let mut gb = GapBuffer::from_text("abcd");
+        gb.delete_at(1, 2);
+        gb.insert_at(1, b"xyz");
+        assert_eq!(gb.to_string(), "axyzd");
+    }
+
+    #[test]
+    fn round_trip_multiple_ops() {
+        let mut gb = GapBuffer::new();
+        gb.insert_at(0, b"hello world");
+        gb.delete_at(5, 6);
+        gb.insert_at(5, b" there");
+        assert_eq!(gb.to_string(), "hello there");
+    }
 }

@@ -150,3 +150,69 @@ pub fn quoted_insert(ed: &mut Editor, _f: Flags, c: i32) -> CmdResult {
 pub fn keyboard_quit(_ed: &mut Editor, _f: Flags, _n: i32) -> CmdResult {
     Err("Quit".into())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_editor() -> Editor {
+        let mut ed = Editor::new(24, 80);
+        // register_commands not needed for command tests — we call fns directly
+        ed
+    }
+
+    #[test]
+    fn self_insert_adds_char() {
+        let mut ed = test_editor();
+        self_insert(&mut ed, Flags::default(), b'a' as i32).unwrap();
+        assert_eq!(ed.active_buffer().text.len(), 1);
+        assert_eq!(ed.active_window().dot.pos, 1);
+    }
+
+    #[test]
+    fn newline_increases_line() {
+        let mut ed = test_editor();
+        newline(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.active_window().dot.line, 2);
+        assert_eq!(ed.active_window().dot.pos, 1);
+    }
+
+    #[test]
+    fn delete_backward_char_reduces_pos() {
+        let mut ed = test_editor();
+        self_insert(&mut ed, Flags::default(), b'x' as i32).unwrap();
+        delete_backward_char(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.active_window().dot.pos, 0);
+        assert_eq!(ed.active_buffer().text.len(), 0);
+    }
+
+    #[test]
+    fn forward_char_moves_dot() {
+        let mut ed = test_editor();
+        self_insert(&mut ed, Flags::default(), b'x' as i32).unwrap();
+        forward_char(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.active_window().dot.pos, 1);
+    }
+
+    #[test]
+    fn backward_char_does_not_underflow() {
+        let mut ed = test_editor();
+        backward_char(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.active_window().dot.pos, 0);
+    }
+
+    #[test]
+    fn beginning_of_buffer_sets_pos_zero() {
+        let mut ed = test_editor();
+        self_insert(&mut ed, Flags::default(), b'a' as i32).unwrap();
+        self_insert(&mut ed, Flags::default(), b'b' as i32).unwrap();
+        beginning_of_buffer(&mut ed, Flags::default(), 1).unwrap();
+        assert_eq!(ed.active_window().dot.pos, 0);
+    }
+
+    #[test]
+    fn delete_char_does_not_panic_on_empty() {
+        let mut ed = test_editor();
+        delete_char(&mut ed, Flags::default(), 1).unwrap();
+    }
+}

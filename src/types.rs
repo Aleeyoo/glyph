@@ -56,3 +56,42 @@ impl Region {
         self.len() == 0
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn point_new() {
+        let p = Point::new(10, 3, 5);
+        assert_eq!(p.pos, 10);
+        assert_eq!(p.line, 3);
+        assert_eq!(p.col, 5);
+    }
+
+    #[test]
+    fn region_forward_len() {
+        let start = Point::new(0, 1, 0);
+        let end = Point::new(10, 2, 0);
+        let r = Region { start, end };
+        assert_eq!(r.len(), 10);
+        assert!(!r.is_empty());
+    }
+
+    #[test]
+    fn region_reverse_len() {
+        let start = Point::new(10, 2, 0);
+        let end = Point::new(0, 1, 0);
+        let r = Region { start, end };
+        assert_eq!(r.len(), 0);
+        assert!(r.is_empty());
+    }
+
+    #[test]
+    fn region_equal_len() {
+        let p = Point::new(5, 1, 5);
+        let r = Region { start: p, end: p };
+        assert_eq!(r.len(), 0);
+        assert!(r.is_empty());
+    }
+}

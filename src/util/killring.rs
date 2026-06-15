@@ -68,4 +68,28 @@ mod tests {
         }
         assert!(kr.yank().is_some());
     }
+
+    #[test]
+    fn yank_pop_cycles() {
+        let mut kr = KillRing::new();
+        kr.push("a", false);
+        kr.push("b", false);
+        assert_eq!(kr.yank_pop(), Some("a"));
+    }
+
+    #[test]
+    fn yank_pop_empty_returns_none() {
+        let mut kr = KillRing::new();
+        assert!(kr.yank_pop().is_none());
+    }
+
+    #[test]
+    fn push_overwrites_oldest() {
+        let mut kr = KillRing::new();
+        for i in 0..33 {
+            kr.push(&format!("entry-{}", i), false);
+        }
+        // "entry-0" should be dropped
+        assert_eq!(kr.yank(), Some("entry-32"));
+    }
 }
