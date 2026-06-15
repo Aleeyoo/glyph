@@ -2,8 +2,37 @@
 
 use std::fs;
 use std::io::Read;
+use std::time::SystemTime;
 
 use crate::editor::{Editor, CmdResult, Flags};
+
+/// Stat the file associated with a buffer and compare its mtime to the
+/// last-recorded mtime. Returns `true` if the file has been modified on disk
+/// since we loaded or last saved it.
+fn fchecktime(ed: &mut Editor) -> bool {
+    let (filename, recorded) = {
+        let buf = ed.active_buffer();
+        (buf.filename.clone(), buf.mtime)
+    };
+    if filename.is_empty() || recorded.is_none() {
+        return false;
+    }
+    match fs::metadata(&filename) {
+        Ok(meta) => {
+            let current = meta
+                .modified()
+                .ok()
+                .and_then(|t| t.duration_since(SystemTime::UNIX_EPOCH).ok())
+                .map(|d| d.as_secs());
+            // If we can't get mtime, be conservative: assume no change
+            match current {
+                Some(secs) => secs != recorded.unwrap(),
+                None => false,
+            }
+        }
+        Err(_) => false,
+    }
+}
 
 /// find-file — open a file in a buffer
 pub fn find_file(ed: &mut Editor, _f: Flags, name: i32) -> CmdResult {
@@ -16,6 +45,12 @@ pub fn find_file(ed: &mut Editor, _f: Flags, name: i32) -> CmdResult {
             buf.text = crate::buffer::text::GapBuffer::from_text(&content);
             buf.filename = path.to_string();
             buf.name = path.rsplit('/').next().unwrap_or(path).to_string();
+            // Record file modification time so we can detect external edits
+            buf.mtime = fs::metadata(path)
+                .ok()
+                .and_then(|m| m.modified().ok())
+                .and_then(|t| t.duration_since(SystemTime::UNIX_EPOCH).ok())
+                .map(|d| d.as_secs());
             ed.set_dirty(false);
             Ok(())
         }
@@ -28,15 +63,33 @@ pub fn find_file(ed: &mut Editor, _f: Flags, name: i32) -> CmdResult {
 
 /// save-buffer — save current buffer to its file
 pub fn save_buffer(ed: &mut Editor, _f: Flags, _n: i32) -> CmdResult {
-    let buf = ed.active_buffer();
-    let path = &buf.filename;
-    let content = buf.text.to_string();
-    drop(buf);
-    if !path.is_empty() {
-        fs::write(path, &content)?;
-        ed.active_buffer_mut().modified = false;
-        ed.set_dirty(false);
+    // Warn if the file was modified on disk since we loaded/last-saved it.
+    if fchecktime(ed) {
+        ed.echo_line = "Warning: file has changed on disk since last read/save".to_string();
     }
+
+    let path = {
+        let buf = ed.active_buffer();
+        buf.filename.clone()
+    };
+    if path.is_empty() {
+        return Ok(());
+    }
+    let content = {
+        let buf = ed.active_buffer();
+        buf.text.to_string()
+    };
+    fs::write(&path, &content)?;
+    {
+        let buf = ed.active_buffer_mut();
+        buf.modified = false;
+        buf.mtime = fs::metadata(&path)
+            .ok()
+            .and_then(|m| m.modified().ok())
+            .and_then(|t| t.duration_since(SystemTime::UNIX_EPOCH).ok())
+            .map(|d| d.as_secs());
+    }
+    ed.set_dirty(false);
     Ok(())
 }
 

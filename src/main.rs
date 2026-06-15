@@ -65,6 +65,7 @@ fn register_commands(ed: &mut Editor) {
     r.register("other-window", |e,f,n| window::other_window(e,f,n), "Other window");
     r.register("enlarge-window", |e,f,n| window::enlarge_window(e,f,n), "Enlarge window");
     r.register("execute-extended-command", |e,f,n| meta::execute_extended_command(e,f,n), "Execute command by name");
+    r.register("eval-expression", |e,f,n| meta::eval_expression(e,f,n), "Evaluate Lisp expression");
     r.register("shell-command", |e,f,n| shell::shell_command(e,f,n), "Execute shell command");
     r.register("shell-command-on-region", |e,f,n| shell::shell_command_on_region(e,f,n), "Shell command on region");
     r.register("search-forward", |e,f,n| search::search_forward(e,f,n), "Search forward");

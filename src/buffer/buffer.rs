@@ -9,6 +9,7 @@ pub struct Buffer {
     pub b_tabw: usize,
     pub modified: bool,
     pub undo: UndoTree,
+    pub mtime: Option<u64>,
 }
 
 impl Buffer {
@@ -21,6 +22,7 @@ impl Buffer {
             b_tabw: 8,
             modified: false,
             undo: UndoTree::new(),
+            mtime: None,
         }
     }
 }

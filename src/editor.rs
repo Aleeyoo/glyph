@@ -1,8 +1,13 @@
 use crate::buffer::buffer::Buffer;
 use crate::display::frame::Frame;
 use crate::display::window::Window;
+use crate::extend::engine::Env;
 use crate::types::BufferId;
+use std::collections::HashMap;
+
 use crate::command::CommandRegistry;
+use crate::extend::engine::LispVal;
+use crate::extend::hooks::HookSystem;
 
 pub type CmdResult = crate::command::CmdResult;
 pub type Flags = crate::command::Flags;
@@ -19,9 +24,12 @@ pub struct Editor {
     pub prefix_negative: bool,
     pub echo_line: String,
     pub command_registry: CommandRegistry,
+    pub variables: HashMap<String, LispVal>,
+    pub hooks: HookSystem,
     pub search_pattern: String,
     pub replace_pattern: String,
     pub shell_cmd: String,
+    pub lisp_env: Option<Env>,
 }
 
 impl Editor {
@@ -43,9 +51,12 @@ impl Editor {
             prefix_negative: false,
             echo_line: String::new(),
             command_registry: CommandRegistry::new(),
+            variables: HashMap::new(),
+            hooks: HookSystem::new(),
             search_pattern: String::new(),
             replace_pattern: String::new(),
             shell_cmd: String::new(),
+            lisp_env: None,
         }
     }
 
