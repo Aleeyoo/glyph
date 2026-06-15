@@ -100,6 +100,7 @@ fn build_default_keymap(ed: &Editor) -> Keymap {
     bind(K_CTRL_E, "end-of-line");
     bind(K_CTRL_D, "delete-char");
     bind(K_CTRL_K, "kill-line");
+    // C-k kill-line bound but fn doesn't exist — keep binding for future
     bind(K_CTRL_S, "search-forward");
     bind(K_CTRL_R, "search-backward");
     bind(K_CTRL_G, "keyboard-quit");
