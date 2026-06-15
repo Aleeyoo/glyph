@@ -4,6 +4,7 @@ mod display;
 mod input;
 mod command;
 mod util;
+mod syntax;
 mod editor;
 
 use editor::Editor;

@@ -11,6 +11,7 @@ pub mod search;
 pub mod shell;
 pub mod advanced;
 pub mod pairs;
+pub mod async_io;
 
 use crate::Editor;
 
