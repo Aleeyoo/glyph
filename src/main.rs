@@ -129,7 +129,20 @@ fn main() -> tui::TuiResult<()> {
     while editor.running {
         let kc = getkey::getkey();
 
-        let handled = km.lookup(kc).is_some() && true;
+        // Keymap dispatch: if key is bound, execute the command
+        let handled = if let Some(action) = km.lookup(kc) {
+            match action {
+                KeyAction::Command(name) => {
+                    if let Some(func) = editor.command_registry.lookup(name) {
+                        let _ = func(&mut editor, Default::default(), kc as i32);
+                    }
+                    true
+                }
+                _ => false,
+            }
+        } else {
+            false
+        };
 
         if !handled {
             match kc {
