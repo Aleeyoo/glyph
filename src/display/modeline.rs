@@ -15,10 +15,18 @@ pub fn draw(ed: &Editor, f: &mut Frame, area: Rect) {
     let win = ed.active_window();
 
     let modified = if buf.modified { "**" } else { "--" };
-    let mode_name = "Fundamental"; // placeholder; modes TBD
+    let mode_name = "Fundamental";
     let pos = format!("L{}", win.dot.line);
 
-    let text = Line::from(format!("{} Mg: {} ({})  {}", modified, buf.name, mode_name, pos));
+    // Build suffix with echo text if present
+    let echo = &ed.echo_line;
+    let suffix = if echo.is_empty() {
+        String::new()
+    } else {
+        format!("  [{}]", echo)
+    };
+
+    let text = Line::from(format!("{} Mg: {} ({})  {}{}", modified, buf.name, mode_name, pos, suffix));
     let style = Style::default().bg(Color::Cyan).fg(Color::Black);
 
     let block = Block::default()

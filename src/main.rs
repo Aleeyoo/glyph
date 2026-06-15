@@ -72,11 +72,38 @@ fn register_commands(ed: &mut Editor) {
     r.register("describe-bindings", |e,f,n| shell::describe_bindings(e,f,n), "Describe bindings");
     r.register("apropos", |e,f,n| shell::apropos(e,f,n), "Apropos");
     r.register("help-help", |e,f,n| shell::help_help(e,f,n), "Help");
+    r.register("inword", |e,f,n| extended::inword(e,f,n), "Check if inside a word");
 }
 
 fn build_default_keymap(ed: &Editor) -> Keymap {
     let mut km = Keymap::new("global");
-    let _ = ed;
+
+    use input::getkey::{K_CTRL_A, K_CTRL_B, K_CTRL_D, K_CTRL_E, K_CTRL_F, K_CTRL_G,
+        K_CTRL_K, K_CTRL_N, K_CTRL_P, K_CTRL_S, K_CTRL_R, K_CTRL_V, K_CTRL_SPACE,
+        K_CTRL_X, K_ESC};
+
+    // Helper to register a single-key binding
+    let mut bind = |kc: KCode, cmd: &'static str| {
+        if ed.command_registry.names().iter().any(|n| *n == cmd) {
+            km.entries.push(KeyEntry { start: kc, end: kc, action: KeyAction::Command(cmd) });
+        }
+    };
+
+    // C- prefix: basic movement (Emacs standard)
+    bind(K_CTRL_N, "next-line");
+    bind(K_CTRL_P, "previous-line");
+    bind(K_CTRL_F, "forward-char");
+    bind(K_CTRL_B, "backward-char");
+    bind(K_CTRL_A, "beginning-of-line");
+    bind(K_CTRL_E, "end-of-line");
+    bind(K_CTRL_D, "delete-char");
+    bind(K_CTRL_K, "kill-line");
+    bind(K_CTRL_S, "search-forward");
+    bind(K_CTRL_R, "search-backward");
+    bind(K_CTRL_G, "keyboard-quit");
+    bind(K_CTRL_SPACE, "set-mark-command");
+
+    km.default = Some("self-insert-command");
     km
 }
 
@@ -85,6 +112,7 @@ fn main() -> tui::TuiResult<()> {
     let mut terminal = tui::init()?;
     let mut editor = Editor::new(rows as usize, cols as usize);
     register_commands(&mut editor);
+    let km = build_default_keymap(&editor);
 
     terminal.draw(|f| {
         let rect = f.size();
@@ -98,8 +126,7 @@ fn main() -> tui::TuiResult<()> {
     while editor.running {
         let kc = getkey::getkey();
 
-        // Keymap dispatch (expand as keymap is populated)
-        let handled = false; // placeholder: keymap dispatch
+        let handled = km.lookup(kc).is_some() && true;
 
         if !handled {
             match kc {
