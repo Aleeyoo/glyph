@@ -19,6 +19,9 @@ pub struct Editor {
     pub prefix_negative: bool,
     pub echo_line: String,
     pub command_registry: CommandRegistry,
+    pub search_pattern: String,
+    pub replace_pattern: String,
+    pub shell_cmd: String,
 }
 
 impl Editor {
@@ -40,6 +43,9 @@ impl Editor {
             prefix_negative: false,
             echo_line: String::new(),
             command_registry: CommandRegistry::new(),
+            search_pattern: String::new(),
+            replace_pattern: String::new(),
+            shell_cmd: String::new(),
         }
     }
 

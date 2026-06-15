@@ -6,6 +6,9 @@ pub mod file;
 pub mod buffer;
 pub mod window;
 pub mod meta;
+pub mod extended;
+pub mod search;
+pub mod shell;
 
 use crate::Editor;
 
