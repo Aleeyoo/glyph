@@ -30,7 +30,6 @@ pub fn draw(ed: &Editor, f: &mut Frame, area: Rect) {
     let style = Style::default().bg(Color::DarkGray).fg(Color::White);
 
     let block = Block::default()
-        .borders(Borders::TOP)
         .style(style);
     let paragraph = Paragraph::new(text)
         .block(block);

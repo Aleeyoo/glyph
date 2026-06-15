@@ -19,6 +19,15 @@ pub fn draw(ed: &Editor, f: &mut Frame, area: Rect) {
     let _dot_pos = ed.active_window().dot.pos;
     let height = area.height as usize;
 
+    // Empty buffer: show ~ lines (Emacs style)
+    if text.is_empty() {
+        let lines: Vec<Line> = (0..height)
+            .map(|_| Line::from(Span::styled("~", Style::default().fg(Color::DarkGray))))
+            .collect();
+        f.render_widget(Paragraph::new(lines), area);
+        return;
+    }
+
     // Compute line starts by scanning for newlines
     let mut line_starts: Vec<usize> = vec![0];
     for (i, &b) in text.iter().enumerate() {
