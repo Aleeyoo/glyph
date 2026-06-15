@@ -57,3 +57,36 @@ pub fn undo_boundary(ed: &mut Editor, _f: Flags, _n: i32) -> CmdResult {
     ed.active_buffer_mut().undo.record(0, vec![]);
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn record_and_undo() {
+        let mut ut = UndoTree::new();
+        ut.record(0, vec![b'a']);
+        assert!(ut.undo().is_some());
+    }
+
+    #[test]
+    fn redo_after_undo() {
+        let mut ut = UndoTree::new();
+        ut.record(0, vec![b'a']);
+        let _ = ut.undo();
+        assert!(ut.redo().is_some());
+    }
+
+    #[test]
+    fn undo_returns_none_at_root() {
+        let mut ut = UndoTree::new();
+        assert!(ut.undo().is_none());
+    }
+
+    #[test]
+    fn redo_returns_none_at_tip() {
+        let mut ut = UndoTree::new();
+        ut.record(0, vec![b'a']);
+        assert!(ut.redo().is_none());
+    }
+}

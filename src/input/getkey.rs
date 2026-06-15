@@ -37,12 +37,21 @@ pub fn getkey() -> KCode {
     }
 }
 
-fn translate_key(code: KeyCode, _mods: event::KeyModifiers) -> KCode {
+fn translate_key(code: KeyCode, mods: event::KeyModifiers) -> KCode {
+    let ctrl = mods.contains(event::KeyModifiers::CONTROL);
     match code {
-        KeyCode::Char(c) => c as u16,
+        KeyCode::Char(c) => {
+            if ctrl && c >= 'a' && c <= 'z' {
+                (c as u8 - b'a' + 1) as u16 // C-a = 1, C-b = 2, ...
+            } else if ctrl && c >= 'A' && c <= 'Z' {
+                (c as u8 - b'A' + 1) as u16
+            } else {
+                c as u16
+            }
+        }
         KeyCode::Esc => K_ESC,
         KeyCode::Enter => b'\n' as u16,
-        KeyCode::Backspace => 0x7f, // DEL
+        KeyCode::Backspace => 0x7f,
         KeyCode::Tab => 9,
         KeyCode::Left => K_LEFT,
         KeyCode::Right => K_RIGHT,

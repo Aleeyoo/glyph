@@ -34,3 +34,38 @@ impl KillRing {
         Some(self.entries[self.current % self.entries.len()].as_str())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_ring_empty() {
+        let kr = KillRing::new();
+        assert!(kr.yank().is_none());
+    }
+
+    #[test]
+    fn push_and_yank() {
+        let mut kr = KillRing::new();
+        kr.push("hello", false);
+        assert_eq!(kr.yank(), Some("hello"));
+    }
+
+    #[test]
+    fn merge_consecutive() {
+        let mut kr = KillRing::new();
+        kr.push("hel", false);
+        kr.push("lo", true);
+        assert_eq!(kr.yank(), Some("hello"));
+    }
+
+    #[test]
+    fn wrap_at_max() {
+        let mut kr = KillRing::new();
+        for i in 0..33 {
+            kr.push(&i.to_string(), false);
+        }
+        assert!(kr.yank().is_some());
+    }
+}
