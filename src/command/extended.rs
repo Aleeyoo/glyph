@@ -32,7 +32,7 @@ pub fn backward_word(ed: &mut Editor, _f: Flags, n: i32) -> CmdResult {
 }
 
 /// inword — is the current position inside a word?
-pub fn inword(ed: &Editor, _pos: usize) -> bool {
+pub fn inword(ed: &Editor) -> bool {
     let text = ed.active_buffer().text.to_vec();
     let pos = ed.active_window().dot.pos;
     pos < text.len() && !text[pos].is_ascii_whitespace()

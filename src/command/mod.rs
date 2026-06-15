@@ -10,6 +10,7 @@ pub mod extended;
 pub mod search;
 pub mod shell;
 pub mod advanced;
+pub mod pairs;
 
 use crate::Editor;
 

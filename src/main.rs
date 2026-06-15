@@ -72,7 +72,8 @@ fn register_commands(ed: &mut Editor) {
     r.register("describe-bindings", |e,f,n| shell::describe_bindings(e,f,n), "Describe bindings");
     r.register("apropos", |e,f,n| shell::apropos(e,f,n), "Apropos");
     r.register("help-help", |e,f,n| shell::help_help(e,f,n), "Help");
-    r.register("inword", |e,f,n| extended::inword(e,f,n), "Check if inside a word");
+    r.register("inword", |e,_,_| { let _ = extended::inword(e); Ok(()) }, "Check if inside a word");
+    r.register("blink-and-insert", |e,f,n| pairs::blink_and_insert(e,f,n), "Insert char with bracket matching");
 }
 
 fn build_default_keymap(ed: &Editor) -> Keymap {
