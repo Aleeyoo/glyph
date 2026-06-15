@@ -17,9 +17,10 @@ pub fn draw(ed: &Editor, f: &mut Frame, area: Rect) {
 
     let text = ed.active_buffer().text.to_vec();
     let _dot_pos = ed.active_window().dot.pos;
+    let is_modified = ed.active_buffer().modified;
     let height = area.height as usize;
 
-    // Empty buffer: show ~ lines (Emacs style)
+    // Empty or unmodified buffer: show ~ lines (Emacs style)
     if text.is_empty() {
         let lines: Vec<Line> = (0..height)
             .map(|_| Line::from(Span::styled("~", Style::default().fg(Color::DarkGray))))

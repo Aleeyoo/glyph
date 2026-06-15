@@ -144,6 +144,9 @@ fn main() -> tui::TuiResult<()> {
         };
 
         if !handled {
+            // HACK: "handled" is computed but not really used as dispatch;
+            // the keymap commands have their own internal logic.
+            // Match fallback for non-keymap keys.
             match kc {
                 getkey::K_CTRL_X => {
                     let second = getkey::getkey();
